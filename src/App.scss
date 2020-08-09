@@ -1,0 +1,20 @@
+.App {
+  direction: rtl;
+  text-align: center;
+  min-height: 100vh;
+}
+
+.App-header {
+  display: flex;
+  justify-content: center;
+  color: grey;
+  font-size: calc(10px + 2vmin);
+
+  h1{
+    margin-bottom: 0;
+  }
+}
+
+.App-link {
+  color: #61dafb;
+}
