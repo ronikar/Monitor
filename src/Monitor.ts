@@ -1,10 +1,14 @@
-import { getStatus } from "./getStatus";
+import { getStatus } from "./utils/getStatus";
 
 type Callback = (data: monitor.Item[]) => void | Promise<void>
 
 export class Monitor {
     private _onDateUpdatedCallbacks: Callback[] = [];
-    private _data: monitor.Item[] = getStatus();
+    private _data: monitor.Item[] = [];
+
+    constructor(){
+        this.updateData();
+    }
 
     public get data() {
         return this._data;
@@ -19,11 +23,12 @@ export class Monitor {
 
         if (!item) return;
 
-        this.updateData();
+        await this.updateData();
     };
 
     public async updateData() {
         const data = await getStatus();
+        this._data = data;
         this._onDateUpdatedCallbacks.forEach(cb => cb(data));
     };
 

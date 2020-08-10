@@ -1,9 +1,7 @@
-import React, { useState } from 'react';
-
-export interface SetIsLoading {
-    type: "setIsLoading";
+export interface SetIsWaitingForReset {
+    type: "setIsWaitingForReset";
     id: string;
-    isLoading: boolean;
+    isWaitingForReset: boolean;
 }
 
 export interface UpdateData {
@@ -12,33 +10,19 @@ export interface UpdateData {
 }
 
 const ACTIONS = {
-    SET_IS_LOADING: "setIsLoading",
+    SET_IS_LOADING: "setIsWaitingForReset",
     UPDATE_DATA: "updateData"
 };
 
-export type Action = SetIsLoading | UpdateData;
+export type Action = SetIsWaitingForReset | UpdateData;
 
-const initStatus: monitor.Status = { data: [] };
-
-export function useStatusReducer(): [monitor.Status, (action: Action) => void] {
-    const [state, setStatus] = useState(initStatus);
-
-    function dispatch(action: Action) {
-        const nextState = dataReducer(state, action);
-        setStatus(nextState);
-    }
-
-    return [state, dispatch];
-}
-
-function dataReducer(state: monitor.Status, action: Action) {
+export function dataReducer(state: monitor.Status, action: Action) {
     switch (action.type) {
         case ACTIONS.SET_IS_LOADING:
-            const { id, isLoading } = action as SetIsLoading
+            const { id, isWaitingForReset } = action as SetIsWaitingForReset
             const { data } = state;
             const item = data.find(_ => _.id === id) as monitor.Item;
-            console.log(state, id);
-            const newItem = { ...item, isLoading }
+            const newItem = { ...item, isWaitingForReset }
 
             return {
                 ...state,

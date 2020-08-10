@@ -10,6 +10,10 @@ declare namespace monitor{
         numberOfAuthRequests: number;
     }
 
+    interface ItemWithActions extends Item{
+        isWaitingForReset: boolean;
+    }
+
     interface Status{
         data: monitor.Item[],
         lastUpdate?: Date;

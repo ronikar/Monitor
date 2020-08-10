@@ -1,6 +1,5 @@
-import React, { useContext, useState, createContext, useEffect } from "react";
-import { getStatus } from "../utils/getStatus";
-import { Monitor } from "../utils/Monitor";
+import React, { useContext, createContext } from "react";
+import { Monitor } from "../Monitor";
 
 export interface ContextProps {
     date: Date;
