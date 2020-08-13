@@ -1,4 +1,4 @@
-import React, { useEffect, useReducer } from "react";
+import React, { useEffect, useState } from "react";
 import styled from 'styled-components';
 
 import { CellProps } from "react-table";
@@ -7,8 +7,6 @@ import CircularProgress from '@material-ui/core/CircularProgress';
 
 import { Table } from "../utils/Table";
 import { useMonitor } from "../conext/MonitorContext";
-import { updateDataAction, setIsWaitingForResetAction } from "../reducers/status/actions";
-import { dataReducer } from "../reducers/status";
 
 const Styles = styled.div`
 padding: 1rem;
@@ -52,15 +50,9 @@ table {
 
 export function StatusTable() {
   const monitor = useMonitor();
-  const [status, dispatch] = useReducer(dataReducer, { data: monitor.data, lastUpdate: monitor.lastUpdate });
+  const [status, setStatus] = useState({ data: monitor.data});
 
-  useEffect(() => monitor.onDataUpdated(data => dispatch(updateDataAction(data))), [monitor]);
-
-  const onResetClick = async (id: string) => {
-    dispatch(setIsWaitingForResetAction(id, true));
-    await monitor.reset(id);
-    dispatch(setIsWaitingForResetAction(id, false));
-  };
+  useEffect(() => monitor.onDataUpdated(data => setStatus({data})), [monitor]);
 
   const columns = React.useMemo(() => [
     {
@@ -77,8 +69,8 @@ export function StatusTable() {
     },
     {
       Header: "איפוס",
-      Cell: createResetButton,
-      getProps: () => ({ onResetClick }) //Add custom properties to cell
+      Cell: CloseButton,
+      getProps: () => ({ onResetClick:  monitor.reset }) //Add custom properties to cell
     }
   ], []);
 
@@ -87,7 +79,14 @@ export function StatusTable() {
   </Styles>;
 }
 
-function createResetButton({ column, row: { original: { id, isWaitingForReset } } }: CellProps<monitor.ItemWithActions>) {
+function CloseButton({ column, row: { original: { id } } }: CellProps<monitor.Item>) {
+  const [isClosing, setIsClosing] = useState<boolean>();
   const { onResetClick } = (column as any).getProps(); // TODO: Create interface for that
-  return isWaitingForReset ? <CircularProgress size="24px" /> : <Clear className="close-btn" onClick={() => onResetClick(id)} />
+
+  const onClick = (id: string) => {
+    setIsClosing(true);
+    onResetClick(id).then(() => setIsClosing(false));
+  };
+
+  return isClosing ? <CircularProgress size="24px" /> : <Clear className="close-btn" onClick={() => onClick(id)} />
 }

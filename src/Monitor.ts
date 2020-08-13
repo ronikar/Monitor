@@ -6,7 +6,7 @@ export class Monitor {
     private _onDateUpdatedCallbacks: Callback[] = [];
     private _data: monitor.Item[] = [];
 
-    constructor(){
+    constructor() {
         this.updateData();
     }
 
@@ -18,15 +18,15 @@ export class Monitor {
         return new Date();
     }
 
-    public async reset(id: string): Promise<void> {
-        const item = this.data.find(item => item.id === id);
+    public reset = async (id: string): Promise<void> => {
+        const item = this._data.find(item => item.id === id);
 
         if (!item) return;
 
         await this.updateData();
     };
 
-    public async updateData() {
+    public updateData = async () => {
         const data = await getStatus();
         this._data = data;
         this._onDateUpdatedCallbacks.forEach(cb => cb(data));
@@ -34,6 +34,6 @@ export class Monitor {
 
     public onDataUpdated(cb: Callback) {
         this._onDateUpdatedCallbacks.push(cb);
-        cb(this.data)
+        cb(this._data)
     }
 }

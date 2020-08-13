@@ -16,7 +16,6 @@ const examples = [{
 }];
 
 export async function getStatus(): Promise<monitor.Item[]> {
-
     return new Promise((resolve) => {
         const data = [{ ...examples[0] }, { ...examples[1] }];
         setTimeout(() => resolve(data), 2000);
