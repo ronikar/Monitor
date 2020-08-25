@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from "react";
-import { useTable, useSortBy, useFilters } from "react-table";
+import React, { useEffect, useRef } from "react";
+import { useTable, useSortBy, useFilters, TableState } from "react-table";
 import styled from 'styled-components';
 
 interface Props {
@@ -47,7 +47,7 @@ table {
 `
 
 export function Table({ initialState, columns, data }: Props) {
-    const [initTableState, setInitTableState] = useState(initialState || []);
+    const initTableStateRef = useRef<TableState<object>>(initialState || []);
 
     const defaultColumn: any = React.useMemo(() => ({
         // Let's set up our default Filter UI
@@ -55,9 +55,9 @@ export function Table({ initialState, columns, data }: Props) {
     }), []);
 
     const { getTableProps, getTableBodyProps, headerGroups, rows, prepareRow, state } =
-        useTable({ columns, data, defaultColumn, initialState: initTableState }, useFilters, useSortBy);
+        useTable({ columns, data, defaultColumn, initialState: initTableStateRef.current }, useFilters, useSortBy);
 
-    useEffect(() => setInitTableState(state), [state]); // Becuase react-table resets filters and sort when data is updated
+    useEffect(() => { initTableStateRef.current = state }, [state]); //react-table resets filters and sort when data is updated
 
     return <TableStyles>
         <table {...getTableProps()}>
@@ -65,7 +65,7 @@ export function Table({ initialState, columns, data }: Props) {
                 {headerGroups.map(headerGroup => (
                     <tr {...headerGroup.getHeaderGroupProps()}>
                         {headerGroup.headers.map((column: any) => (
-                            <th >
+                            <th>
                                 <div {...column.getHeaderProps(column.getSortByToggleProps())}>
                                     <div className="title">
                                         {column.render('Header')}
@@ -81,13 +81,9 @@ export function Table({ initialState, columns, data }: Props) {
             <tbody {...getTableBodyProps()}>
                 {rows.map((row, i) => {
                     prepareRow(row)
-                    return (
-                        <tr {...row.getRowProps()}>
-                            {row.cells.map(cell => {
-                                return <td {...cell.getCellProps()}>{cell.render('Cell')}</td>
-                            })}
-                        </tr>
-                    )
+                    return <tr {...row.getRowProps()}>
+                        {row.cells.map(cell => <td {...cell.getCellProps()}>{cell.render('Cell')}</td>)}
+                    </tr>;
                 })}
             </tbody>
         </table>

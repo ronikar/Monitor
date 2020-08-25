@@ -67,7 +67,7 @@ export function StatusTable() {
     sortBy: [{ id: 'id', desc: false }]
   }), []);
 
-  return !monitor || status.data.length == 0 ? <CircularProgress size="60px" style={{ marginTop: "30px" }} /> :
+  return !monitor || status.data.length === 0 ? <CircularProgress size="60px" style={{ marginTop: "30px" }} /> :
     <StatusTableStyles>
       <Table columns={columns} data={status.data} initialState={initialState}></Table>
     </StatusTableStyles>;
