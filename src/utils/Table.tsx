@@ -1,30 +1,79 @@
-import React from "react";
-import { useTable } from "react-table"
+import React, { useState, useEffect } from "react";
+import { useTable, useSortBy, useFilters } from "react-table";
+import styled from 'styled-components';
 
 interface Props {
     columns: any;
     data: any;
+    initialState?: any
 }
 
-export function Table({ columns, data }: Props) {
-    const {
-        getTableProps,
-        getTableBodyProps,
-        headerGroups,
-        rows,
-        prepareRow,
-    } = useTable({
-        columns,
-        data,
-    })
+const TableStyles = styled.div`
+padding: 1rem;
 
-    return (
+table {
+    margin: 0 auto;
+    width: 100%;
+    max-width: 1200px;
+    border-collapse: collapse;
+
+    th {
+    vertical-align: baseline;
+    }
+    .title{
+        display: flex;
+        justify-content: center;
+        vertical-align: baseline;
+        padding-top: 12px;
+        padding-bottom: 12px;
+        background-color:#4d94ff;
+        color: white
+    }
+
+  tr{
+    :nth-child(even){background-color: #f2f2f2;}
+    :hover {background-color: #ddd;}
+  }
+
+  td {
+    border: 1px solid #ddd;
+    padding: 8px;
+
+    :last-child {
+      border-right: 0;
+    }
+  }
+}
+`
+
+export function Table({ initialState, columns, data }: Props) {
+    const [initTableState, setInitTableState] = useState(initialState || []);
+
+    const defaultColumn: any = React.useMemo(() => ({
+        // Let's set up our default Filter UI
+        Filter: () => (<div></div>)
+    }), []);
+
+    const { getTableProps, getTableBodyProps, headerGroups, rows, prepareRow, state } =
+        useTable({ columns, data, defaultColumn, initialState: initTableState }, useFilters, useSortBy);
+
+    useEffect(() => setInitTableState(state), [state]); // Becuase react-table resets filters and sort when data is updated
+
+    return <TableStyles>
         <table {...getTableProps()}>
             <thead>
                 {headerGroups.map(headerGroup => (
                     <tr {...headerGroup.getHeaderGroupProps()}>
-                        {headerGroup.headers.map(column => (
-                            <th {...column.getHeaderProps()}>{column.render('Header')}</th>
+                        {headerGroup.headers.map((column: any) => (
+                            <th >
+                                <div {...column.getHeaderProps(column.getSortByToggleProps())}>
+                                    <div className="title">
+                                        {column.render('Header')}
+                                        <SortArrow column={column} />
+                                    </div>
+                                </div>
+                                <div>{column.canFilter ? column.render('Filter') : null}</div>
+                            </th>
                         ))}
                     </tr>
                 ))}
@@ -42,5 +91,11 @@ export function Table({ columns, data }: Props) {
                 })}
             </tbody>
         </table>
-    )
+    </TableStyles>;
+}
+
+function SortArrow({ column }: { column: any }) {
+    return <div className="sort-arrow" style={{ minWidth: "20px" }}>
+        {column.isSorted ? column.isSortedDesc ? ' 🔽' : ' 🔼' : " "}
+    </div>
 }

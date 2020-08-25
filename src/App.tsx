@@ -1,7 +1,7 @@
 import React from 'react';
 import './App.scss';
 import { ProvideMonitor } from './conext/MonitorContext';
-import { StatusTable } from './status/StatusTable';
+import { StatusTable } from './StatusTable';
 
 function App() {
   return (

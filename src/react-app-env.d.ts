@@ -8,6 +8,7 @@ declare namespace monitor{
         numberOfConnections: number;
         uniqueUsers: number;
         numberOfAuthRequests: number;
+        streamStatus: string;
     }
 
     interface Status{
